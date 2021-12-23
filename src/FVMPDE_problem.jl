@@ -1,22 +1,5 @@
 #include("HPDE_options.jl")
 ##########################################################
-abstract type AbstractHPDEProblem end
-
-abstract type Dimension end
-abstract type _1D <: Dimension end
-abstract type _2D <: Dimension end
-abstract type _3D <: Dimension end
-
-function checkDim(D::Type{<:Dimension})
-    if D === _1D
-        return 1
-    elseif D === _2D
-        return 2
-    elseif D === _3D
-        return 3
-    end
-    return 0
-end
 
 mutable struct FVMPDEProblem
     """
@@ -57,7 +40,7 @@ mutable struct FVMPDEProblem
 
     dimension::Type{<:Dimension}
 
-    function FVMPDEProblem(func_F::Function, U0; kwargs...)
+    function FVMPDEProblem(grid::ExtendableGrids, U0, func_F::Function; kwargs...)
 
         zeroFunc(U) = zeros(size(U))
         F = func_F
