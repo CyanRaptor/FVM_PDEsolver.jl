@@ -1,6 +1,7 @@
 module FVM_PDEsolver
 
-greet() = print("Hello World!")
-export greet
+export plusTwo
+
+plusTwo(x) = return x+2
 
 end # module
