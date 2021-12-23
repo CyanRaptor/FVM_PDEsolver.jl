@@ -1,10 +1,5 @@
 #include("HPDE_options.jl")
 ##########################################################
-"""
-$(TYPEDEF)
-
-Data type for PDE equations (i.e., problem)
-"""
 abstract type AbstractHPDEProblem end
 
 abstract type Dimension end
