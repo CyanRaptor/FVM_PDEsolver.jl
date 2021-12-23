@@ -1,6 +1,6 @@
 module FVM_PDEsolver
-export greet
-greet() = print("Hello World!")
 
+greet() = print("Hello World!")
+export greet
 
 end # module
