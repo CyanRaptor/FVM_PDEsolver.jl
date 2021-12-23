@@ -40,7 +40,7 @@ mutable struct FVMPDEProblem
 
     dimension::Type{<:Dimension}
 
-    function FVMPDEProblem(grid::ExtendableGrids, U0, func_F::Function; kwargs...)
+    function FVMPDEProblem(grid::FVMPDEGrid, U0, func_F::Function; kwargs...)
 
         zeroFunc(U) = zeros(size(U))
         F = func_F
