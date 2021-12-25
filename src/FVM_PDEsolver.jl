@@ -10,8 +10,8 @@ export FVMPDEGrid
 include("FVMPDE_problem.jl")
 export FVMPDEProblem
 
-include("FVMPDE_methods.j")
-include("FVMPDE_solver.j")
+include("FVMPDE_methods.jl")
+include("FVMPDE_solver.jl")
 export FVMPDESolve
 
 end # module
