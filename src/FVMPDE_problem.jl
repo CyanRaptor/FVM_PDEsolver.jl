@@ -40,30 +40,42 @@ mutable struct FVMPDEProblem
     U_min
     U_max
 
-    dimension::Type{<:Dimension}
-
     function FVMPDEProblem(grid::FVMPDEGrid, U0, func_F::Function; kwargs...)
 
         zeroFunc(U) = zeros(size(U))
         F = func_F
-        D = _1D
-        (G,D) = haskey(kwargs,:func_G) ? (kwargs[:func_G],_2D) : (zeroFunc,D)
-        (H,D) = haskey(kwargs,:func_G) && haskey(kwargs,:func_H) ? (kwargs[:func_H],_3D) : (zeroFunc,D)
+        @assert size(U0,1) == grid.nx
+        if haskey(kwargs,:func_G)
+            G = kwargs[:func_G]
+            @assert size(U0,2) == grid.ny
+            if haskey(kwargs,:func_H)
+                H = kwargs[:func_H]
+                nvars = size(U0,4)
+                @assert grid.dimension == _3D
+                @assert length(size(U0))-1 == 3
+                @assert size(U0,3) == grid.nz
+            else
+                H = zeroFunc
+                nvars = size(U0,3)
+                @assert grid.dimension == _2D
+                @assert length(size(U0))-1 == 2
+            end
+        else
+            G = zeroFunc
+            H = zeroFunc
+            nvars = size(U0,2)
+            @assert grid.dimension == _1D
+            @assert length(size(U0))-1 == 1
+        end
+
         S = haskey(kwargs,:func_S) ? kwargs[:func_S] : zeroFunc
 
         @assert size(F(U0)) == size(U0)
         @assert size(G(U0)) == size(U0)
         @assert size(H(U0)) == size(U0)
         @assert size(S(U0)) == size(U0)
-        @assert D == grid.dimension
-        @assert length(size(U0))-1 == checkDim(D)
-        @assert size(U0,1) == length(grid.X)
-        if D == _2D || D == _3D
-            @assert size(U0,2) == length(grid.Y)
-        end
-        if D == _3D
-            @assert size(U0,3) == length(grid.Z)
-        end
+
+        #grid.U = reshape(U0,grid.nx,grid.ny,grid.nz,nvars)
         grid.U = copy(U0)
         θ = haskey(kwargs,:parameters) ? kwargs[:parameters] : nothing
 
@@ -73,20 +85,10 @@ mutable struct FVMPDEProblem
         @assert size(U_min) == size(U0)
         @assert size(U_max) == size(U0)
 
-        nvars = size(U0,checkDim(D)+1)
-
         #@assert checkDim(D) == size(U0,)
 
-        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max, D )
+        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max)
     end
 
 
 end
-
-X = [0.0, 0.1, 0.3, 0.6, 1.0, 1.5]
-grid = FVMPDEGrid(X,X)
-
-myF(U) = zeros(size(U))
-u0=zeros(6,6,1)
-
-FVMPDEProblem(grid,u0,myF,func_G=myF)

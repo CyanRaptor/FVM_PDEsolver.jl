@@ -29,8 +29,9 @@ mutable struct FVMPDEGrid
     U
     Uboundries
     dimension::Type{<:Dimension}
-    function FVMPDEGrid(X,Y,Z,nx,ny,nz,dX,dY,dZ,U,Uboundries,dimension)
-        return new(X,Y,Z,nx,ny,nz,dX,dY,dZ,U,Uboundries,dimension)
+    indices
+    function FVMPDEGrid(X,Y,Z,nx,ny,nz,dX,dY,dZ,U,Uboundries,dimension,indices)
+        return new(X,Y,Z,nx,ny,nz,dX,dY,dZ,U,Uboundries,dimension,indices)
     end
 end
 
@@ -45,9 +46,9 @@ function FVMPDEGrid(_X::AbstractVector, _Y::AbstractVector, _Z::AbstractVector)
     dY = _Y[2:end] .- _Y[1:end-1]
     dZ = _Z[2:end] .- _Z[1:end-1]
     #Uboundries = zeros(length(_X),length(_Y))
-    dimension = _2D
-
-    return FVMPDEGrid(X,Y,Z,nx,ny,nz,dX,dY,dZ,nothing,nothing,dimension)
+    dimension = _3D
+    indices = CartesianIndices((Base.OneTo(nx),Base.OneTo(ny),Base.OneTo(nz)))
+    return FVMPDEGrid(X,Y,Z,nx,ny,nz,dX,dY,dZ,nothing,nothing,dimension,indices)
 end
 
 function FVMPDEGrid(_X::AbstractVector, _Y::AbstractVector)
@@ -59,8 +60,8 @@ function FVMPDEGrid(_X::AbstractVector, _Y::AbstractVector)
     dY = _Y[2:end] .- _Y[1:end-1]
     #Uboundries = zeros(length(_X),length(_Y))
     dimension = _2D
-
-    return FVMPDEGrid(X,Y,[],nx,ny,0,dX,dY,nothing,nothing,nothing,dimension)
+    indices = CartesianIndices((Base.OneTo(nx),Base.OneTo(ny)))
+    return FVMPDEGrid(X,Y,[],nx,ny,1,dX,dY,nothing,nothing,nothing,dimension,indices)
 end
 
 function FVMPDEGrid(_X::AbstractVector)
@@ -69,6 +70,6 @@ function FVMPDEGrid(_X::AbstractVector)
     dX = _X[2:end] .- _X[1:end-1]
     #Uboundries = zeros(length(_X))
     dimension = _1D
-
-    return FVMPDEGrid(X,[],[],nx,0,0,dX,nothing,nothing,nothing,nothing,dimension)
+    indices = CartesianIndices((Base.OneTo(nx)))
+    return FVMPDEGrid(X,[],[],nx,1,1,dX,nothing,nothing,nothing,nothing,dimension,indices)
 end
