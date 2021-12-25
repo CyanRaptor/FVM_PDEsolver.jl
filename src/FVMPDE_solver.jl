@@ -1,6 +1,6 @@
 
 function FVMPDESolve(prob::FVMPDEProblem,tspan;kwargs...)
-    scheme = haskey(kwargs,:scheme) ? kwargs[:scheme] : UpWind_FO
+    scheme = haskey(kwargs,:scheme) ? kwargs[:scheme] : UpWind_F
 
     U0 = copy(prob.U0)
     ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme)
