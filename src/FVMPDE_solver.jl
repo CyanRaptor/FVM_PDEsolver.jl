@@ -3,9 +3,13 @@ function FVMPDESolve(prob::FVMPDEProblem,tspan;kwargs...)
     scheme = haskey(kwargs,:scheme) ? kwargs[:scheme] : UpWind_F
 
     U0 = copy(prob.U0)
-    ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme)
 
-    ODE_Problem = ODEProblem(ODE_Function,U0,tspan);
+    ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme)
+    if haskey(kwargs,:dt)
+        ODE_Problem = ODEProblem(ODE_Function,U0,tspan,dt=kwargs[:dt]);
+    else
+        ODE_Problem = ODEProblem(ODE_Function,U0,tspan)
+    end
     sol = DifferentialEquations.solve(ODE_Problem)
 
     return sol
