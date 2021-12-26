@@ -57,8 +57,6 @@ end
 
 function LRJacobian(func_F,u,t,p)
     A = ForwardDiff.jacobian(func_F, u)
-    #A = (abs.(A) .> 1e-10) .* A
-    #println(A)
     Λ = diagm(eigvals(A))
     Λ⁺ = 0.5 .* (Λ .+ abs.(Λ))
     Λ⁻ = 0.5 .* (Λ .- abs.(Λ))
@@ -66,5 +64,7 @@ function LRJacobian(func_F,u,t,p)
     P⁻¹ = inv(P)
     A⁺ = P * Λ⁺ * P⁻¹
     A⁻ = P * Λ⁻ * P⁻¹
+    @assert typeof(Λ) === Matrix{Float64}
+
     return A⁺, A⁻
 end
