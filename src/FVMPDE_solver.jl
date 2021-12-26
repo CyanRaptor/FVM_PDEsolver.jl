@@ -8,16 +8,6 @@ function FVMPDESolve(prob::FVMPDEProblem,tspan;kwargs...)
     ODE_Problem = ODEProblem(ODE_Function,U0,tspan);
     sol = DifferentialEquations.solve(ODE_Problem)
 
-    if checkDim(prob.grid.dimension) == 1
-        for i = 1:length(sol.u)
-            sol.u[i] = sol.u[i][:,1,1,:]
-        end
-    elseif checkDim(prob.grid.dimension) == 2
-        for i = 1:length(sol.u)
-            sol.u[i] = sol.u[i][:,:,1,:]
-        end
-    end
-
     return sol
 end
 

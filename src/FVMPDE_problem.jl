@@ -70,13 +70,13 @@ mutable struct FVMPDEProblem
 
         S = haskey(kwargs,:func_S) ? kwargs[:func_S] : zeroFunc
 
-        @assert size(F(U0)) == size(U0)
-        @assert size(G(U0)) == size(U0)
-        @assert size(H(U0)) == size(U0)
-        @assert size(S(U0)) == size(U0)
+        @assert size(F(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+        @assert size(G(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+        @assert size(H(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+        @assert size(S(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
 
         #grid.U = reshape(U0,grid.nx,grid.ny,grid.nz,nvars)
-        grid.U = copy(U0)
+        #grid.U = copy(U0)
         θ = haskey(kwargs,:parameters) ? kwargs[:parameters] : nothing
 
         U_min = haskey(kwargs,:ul) ? kwargs[:ul] : -Inf * ones(size(U0))
