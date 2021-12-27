@@ -61,14 +61,21 @@ function LRJacobian(func_F,u,t,p,jac)
     else
         A = ForwardDiff.jacobian(func_F, u)
     end
-    Λ = diagm(eigvals(A))
-    Λ⁺ = 0.5 .* (Λ .+ abs.(Λ))
-    Λ⁻ = 0.5 .* (Λ .- abs.(Λ))
-    P = eigvecs(A)
-    P⁻¹ = inv(P)
-    A⁺ = P * Λ⁺ * P⁻¹
-    A⁻ = P * Λ⁻ * P⁻¹
-    @assert typeof(Λ) === Matrix{Float64}
+
+    if length(size(A)) == 1
+        A = reshape(A,1,1)
+        A⁺ = 0.5 .* (A .+ abs.(A))
+        A⁻ = 0.5 .* (A .- abs.(A))
+    else
+        Λ = diagm(eigvals(A))
+        Λ⁺ = 0.5 .* (Λ .+ abs.(Λ))
+        Λ⁻ = 0.5 .* (Λ .- abs.(Λ))
+        P = eigvecs(A)
+        P⁻¹ = inv(P)
+        A⁺ = P * Λ⁺ * P⁻¹
+        A⁻ = P * Λ⁻ * P⁻¹
+        @assert typeof(Λ) === Matrix{Float64}
+    end
 
     return A⁺, A⁻
 end
