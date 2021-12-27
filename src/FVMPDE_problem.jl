@@ -40,8 +40,10 @@ mutable struct FVMPDEProblem
     U_min
     U_max
 
-    function FVMPDEProblem(grid::FVMPDEGrid, U0, func_F::Function; kwargs...)
+    jac
 
+    function FVMPDEProblem(grid::FVMPDEGrid, U0, func_F::Function; kwargs...)
+        jac = haskey(kwargs,:jacobian) ? kwargs[:jacobian] : false
         zeroFunc(U) = zeros(size(U))
         F = func_F
         @assert size(U0,1) == grid.nx
@@ -69,10 +71,15 @@ mutable struct FVMPDEProblem
         end
 
         S = haskey(kwargs,:func_S) ? kwargs[:func_S] : zeroFunc
-
-        @assert size(F(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
-        @assert size(G(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
-        @assert size(H(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+        if !jac
+            @assert size(F(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+            @assert size(G(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+            @assert size(H(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+        else
+            @assert size(F(U0[grid.indices[1],:]),1) == length(U0[grid.indices[1],:])
+            @assert size(F(U0[grid.indices[1],:]),2) == length(U0[grid.indices[1],:])
+            # TODO: add @assert for G and H
+        end
         @assert size(S(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
 
         #grid.U = reshape(U0,grid.nx,grid.ny,grid.nz,nvars)
@@ -85,9 +92,11 @@ mutable struct FVMPDEProblem
         @assert size(U_min) == size(U0)
         @assert size(U_max) == size(U0)
 
+
+
         #@assert checkDim(D) == size(U0,)
 
-        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max)
+        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max,jac)
     end
 
 

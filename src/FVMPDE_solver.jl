@@ -19,17 +19,17 @@ function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme)
     θ = prob.param
     indices = prob.grid.indices
     Δx = prob.grid.dX[1]
-    ∂F∂x = FVMPDE_∂F∂x(scheme,prob.F,u,Δx,indices,1,t,θ)
+    ∂F∂x = FVMPDE_∂F∂x(scheme,prob.F,u,Δx,indices,1,t,θ,prob.jac)
 
     if prob.grid.dimension == _2D
         Δy = prob.grid.dY[1]
-        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,Δy,indices,2,t,θ)
+        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,Δy,indices,2,t,θ,prob.jac)
         ∂H∂z = 0
     elseif prob.grid.dimension == _3D
         Δy = prob.grid.dY[1]
         Δz = prob.grid.dZ[1]
-        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,Δy,indices,2,t,θ)
-        ∂H∂z = FVMPDE_∂F∂x(scheme,prob.H,u,Δz,indices,3,t,θ)
+        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,Δy,indices,2,t,θ,prob.jac)
+        ∂H∂z = FVMPDE_∂F∂x(scheme,prob.H,u,Δz,indices,3,t,θ,prob.jac)
     else
         ∂G∂y = 0
         ∂H∂z = 0
@@ -42,21 +42,25 @@ function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme)
     return ∂u∂t
 end
 
-function FVMPDE_∂F∂x(scheme,func_F,u,Δx,indices,_dim,t,p)
+function FVMPDE_∂F∂x(scheme,func_F,u,Δx,indices,_dim,t,p,jac)
     Uₓᴸ, Uₓᴿ = scheme(u,Δx,indices,_dim)
 
     ∂f∂x = zeros(size(u))
 
     for i in indices
-        A⁺ , A⁻ = LRJacobian(func_F,u[i,:],t,p)
+        A⁺ , A⁻ = LRJacobian(func_F,u[i,:],t,p,jac)
         ∂f∂x[i,:] = (A⁻ * Uₓᴸ[i,:] .+ A⁺ * Uₓᴿ[i,:])
     end
     return ∂f∂x
 end
 
 
-function LRJacobian(func_F,u,t,p)
-    A = ForwardDiff.jacobian(func_F, u)
+function LRJacobian(func_F,u,t,p,jac)
+    if jac
+        A = func_F(u)
+    else
+        A = ForwardDiff.jacobian(func_F, u)
+    end
     Λ = diagm(eigvals(A))
     Λ⁺ = 0.5 .* (Λ .+ abs.(Λ))
     Λ⁻ = 0.5 .* (Λ .- abs.(Λ))
