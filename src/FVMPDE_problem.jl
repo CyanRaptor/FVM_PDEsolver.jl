@@ -42,8 +42,9 @@ mutable struct FVMPDEProblem
 
     jac
     ode_problem_kwargs
+    tspan
 
-    function FVMPDEProblem(grid::FVMPDEGrid, U0, func_F::Function; kwargs...)
+    function FVMPDEProblem(grid::FVMPDEGrid, tspan, U0, func_F::Function; kwargs...)
         if haskey(kwargs,:jacobian)
             jac = kwargs[:jacobian]
             kwargs = Dict([p for p in pairs(kwargs) if p[1] != :jacobian])
@@ -94,7 +95,7 @@ mutable struct FVMPDEProblem
             @assert size(F(U0[grid.indices[1],:]),2) == length(U0[grid.indices[1],:])
             # TODO: add @assert for G and H
         end
-        @assert size(S(U0)) == size(U0) 
+        @assert size(S(U0)) == size(U0)
 
         #grid.U = reshape(U0,grid.nx,grid.ny,grid.nz,nvars)
         #grid.U = copy(U0)
@@ -124,7 +125,7 @@ mutable struct FVMPDEProblem
 
         #@assert checkDim(D) == size(U0,)
 
-        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max,jac,kwargs)
+        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max,jac,kwargs,tspan)
     end
 
 

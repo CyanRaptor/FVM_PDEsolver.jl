@@ -1,5 +1,5 @@
 
-function FVMPDESolve(prob::FVMPDEProblem,tspan;kwargs...)
+function FVMPDESolve(prob::FVMPDEProblem;kwargs...)
     if haskey(kwargs,:scheme)
         scheme = kwargs[:scheme]
         kwargs = Dict([p for p in pairs(kwargs) if p[1] != :scheme])
@@ -9,8 +9,16 @@ function FVMPDESolve(prob::FVMPDEProblem,tspan;kwargs...)
     U0 = copy(prob.U0)
 
     ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme)
-    ODE_Problem = ODEProblem(ODE_Function,U0,tspan;prob.ode_problem_kwargs...);
-    sol = DifferentialEquations.solve(ODE_Problem;kwargs...)
+    ODE_Problem = ODEProblem(ODE_Function,U0,prob.tspan;prob.ode_problem_kwargs...);
+
+    if haskey(kwargs,:algorithm)
+        alg = kwargs[:algorithm]
+        kwargs = Dict([p for p in pairs(kwargs) if p[1] != :algorithm])
+        sol = DifferentialEquations.solve(ODE_Problem,alg;kwargs...)
+    else
+        sol = DifferentialEquations.solve(ODE_Problem;kwargs...)
+    end
+
 
     return sol
 end
