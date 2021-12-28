@@ -6,9 +6,17 @@ function FVMPDESolve(prob::FVMPDEProblem;kwargs...)
     else
         scheme = UpWind_F
     end
+
+    if haskey(kwargs,:showstep)
+        dt_show = kwargs[:showstep]
+        kwargs = Dict([p for p in pairs(kwargs) if p[1] != :showstep])
+    else
+        dt_show = Inf
+    end
+
     U0 = copy(prob.U0)
 
-    ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme)
+    ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme,dt_show)
     ODE_Problem = ODEProblem(ODE_Function,U0,prob.tspan;prob.ode_problem_kwargs...);
 
     if haskey(kwargs,:algorithm)
@@ -23,7 +31,11 @@ function FVMPDESolve(prob::FVMPDEProblem;kwargs...)
     return sol
 end
 
-function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme)
+function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme,dt_show)
+    if t - prob.t > dt_show
+        println(t)
+        prob.t = t
+    end
     θ = prob.param
     indices = prob.grid.indices
     Δx = prob.grid.dX[1]

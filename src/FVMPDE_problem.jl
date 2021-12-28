@@ -43,6 +43,7 @@ mutable struct FVMPDEProblem
     jac
     ode_problem_kwargs
     tspan
+    t
 
     function FVMPDEProblem(grid::FVMPDEGrid, tspan, U0, func_F::Function; kwargs...)
         if haskey(kwargs,:jacobian)
@@ -125,7 +126,7 @@ mutable struct FVMPDEProblem
 
         #@assert checkDim(D) == size(U0,)
 
-        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max,jac,kwargs,tspan)
+        return new(grid,F, G, H, S, nvars, θ, U0, U_min, U_max,jac,kwargs,tspan,0)
     end
 
 
