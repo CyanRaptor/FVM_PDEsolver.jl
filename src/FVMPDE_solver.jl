@@ -62,7 +62,7 @@ function LRJacobian(func_F,u,t,p,jac)
         A = ForwardDiff.jacobian(func_F, u)
     end
 
-    if length(size(A)) == 1
+    if size(A,1) == 1
         A = reshape(A,1,1)
         A⁺ = 0.5 .* (A .+ abs.(A))
         A⁻ = 0.5 .* (A .- abs.(A))

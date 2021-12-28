@@ -80,7 +80,7 @@ mutable struct FVMPDEProblem
             @assert size(F(U0[grid.indices[1],:]),2) == length(U0[grid.indices[1],:])
             # TODO: add @assert for G and H
         end
-        @assert size(S(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
+        @assert size(S(U0)) == size(U0)
 
         #grid.U = reshape(U0,grid.nx,grid.ny,grid.nz,nvars)
         #grid.U = copy(U0)
