@@ -1,16 +1,16 @@
 
 function FVMPDESolve(prob::FVMPDEProblem,tspan;kwargs...)
-    scheme = haskey(kwargs,:scheme) ? kwargs[:scheme] : UpWind_F
-
+    if haskey(kwargs,:scheme)
+        scheme = kwargs[:scheme]
+        kwargs = Dict([p for p in pairs(kwargs) if p[1] != :scheme])
+    else
+        scheme = UpWind_F
+    end
     U0 = copy(prob.U0)
 
     ODE_Function(u,p,t) = FVMPDE_∂u∂t(prob,u,t,scheme)
-    if haskey(kwargs,:dt)
-        ODE_Problem = ODEProblem(ODE_Function,U0,tspan,dt=kwargs[:dt]);
-    else
-        ODE_Problem = ODEProblem(ODE_Function,U0,tspan)
-    end
-    sol = DifferentialEquations.solve(ODE_Problem)
+    ODE_Problem = ODEProblem(ODE_Function,U0,tspan;prob.ode_problem_kwargs...);
+    sol = DifferentialEquations.solve(ODE_Problem;kwargs...)
 
     return sol
 end
@@ -68,13 +68,15 @@ function LRJacobian(func_F,u,t,p,jac)
         A⁻ = 0.5 .* (A .- abs.(A))
     else
         Λ = diagm(eigvals(A))
+        @assert typeof(Λ) === Matrix{Float64}
         Λ⁺ = 0.5 .* (Λ .+ abs.(Λ))
         Λ⁻ = 0.5 .* (Λ .- abs.(Λ))
         P = eigvecs(A)
         P⁻¹ = inv(P)
         A⁺ = P * Λ⁺ * P⁻¹
         A⁻ = P * Λ⁻ * P⁻¹
-        @assert typeof(Λ) === Matrix{Float64}
+
+
     end
 
     return A⁺, A⁻
