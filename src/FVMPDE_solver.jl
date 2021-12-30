@@ -1,5 +1,6 @@
 
 function FVMPDESolve(prob::FVMPDEProblem;kwargs...)
+    prob.t = 0
     if haskey(kwargs,:scheme)
         scheme = kwargs[:scheme]
         kwargs = Dict([p for p in pairs(kwargs) if p[1] != :scheme])
@@ -38,18 +39,19 @@ function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme,dt_show)
     end
     θ = prob.param
     indices = prob.grid.indices
-    Δx = prob.grid.dX[1]
-    ∂F∂x = FVMPDE_∂F∂x(scheme,prob.F,u,Δx,indices,1,t,θ,prob.jac)
+    Δx = prob.grid.dX
+    Δx_c = prob.grid.dX_C
+    ∂F∂x = FVMPDE_∂F∂x(scheme,prob.F,u,prob.grid,1,t,θ,prob.jac)
 
     if prob.grid.dimension == _2D
         Δy = prob.grid.dY[1]
-        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,Δy,indices,2,t,θ,prob.jac)
+        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,prob.grid,2,t,θ,prob.jac)
         ∂H∂z = 0
     elseif prob.grid.dimension == _3D
         Δy = prob.grid.dY[1]
         Δz = prob.grid.dZ[1]
-        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,Δy,indices,2,t,θ,prob.jac)
-        ∂H∂z = FVMPDE_∂F∂x(scheme,prob.H,u,Δz,indices,3,t,θ,prob.jac)
+        ∂G∂y = FVMPDE_∂F∂x(scheme,prob.G,u,prob.grid,2,t,θ,prob.jac)
+        ∂H∂z = FVMPDE_∂F∂x(scheme,prob.H,u,prob.grid,3,t,θ,prob.jac)
     else
         ∂G∂y = 0
         ∂H∂z = 0
@@ -62,12 +64,12 @@ function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme,dt_show)
     return ∂u∂t
 end
 
-function FVMPDE_∂F∂x(scheme,func_F,u,Δx,indices,_dim,t,p,jac)
-    Uₓᴸ, Uₓᴿ = scheme(u,Δx,indices,_dim)
+function FVMPDE_∂F∂x(scheme,func_F,u,grid::FVMPDEGrid,_dim,t,p,jac)
+    Uₓᴸ, Uₓᴿ = scheme(u,grid,_dim)
 
     ∂f∂x = zeros(size(u))
 
-    for i in indices
+    for i in grid.indices
         A⁺ , A⁻ = LRJacobian(func_F,u[i,:],t,p,jac)
         ∂f∂x[i,:] = (A⁻ * Uₓᴸ[i,:] .+ A⁺ * Uₓᴿ[i,:])
     end
