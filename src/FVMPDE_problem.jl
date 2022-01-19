@@ -45,7 +45,7 @@ mutable struct FVMPDEProblem
     tspan
     t
 
-    function FVMPDEProblem(grid::FVMPDEGrid, tspan, U0, func_F::Function; kwargs...)
+    function FVMPDEProblem(grid::FVMPDEGrid, tspan, U0; kwargs...)
         if haskey(kwargs,:jacobian)
             jac = kwargs[:jacobian]
             kwargs = Dict([p for p in pairs(kwargs) if p[1] != :jacobian])
@@ -53,7 +53,7 @@ mutable struct FVMPDEProblem
             jac = false
         end
         zeroFunc(U) = zeros(size(U))
-        F = func_F
+        F = kwargs[:F]
         @assert size(U0,1) == grid.nx
         if haskey(kwargs,:G)
             G = kwargs[:G]
