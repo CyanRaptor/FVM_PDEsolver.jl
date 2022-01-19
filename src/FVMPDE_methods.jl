@@ -75,7 +75,7 @@ function uw4(r)
     return κ_Scheme(r,1/2)
 end
 
-function cd(r)
+function scd(r)
     return r
 end
 
