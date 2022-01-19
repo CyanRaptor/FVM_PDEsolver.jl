@@ -11,7 +11,8 @@ include("FVMPDE_problem.jl")
 export FVMPDEProblem
 
 include("FVMPDE_methods.jl")
-export UpWind_F, UpWind_S, UpWind_Q, UpWind_C, SCD, Koren, SuperBee
+export uw1,uw2,uw3,uw4,cd,fr,kn,sb,mm,mu,ha,va1,va2,vl,op,hc,hq,cm,mc,sm,um,gg
+
 
 include("FVMPDE_solver.jl")
 export FVMPDESolve
