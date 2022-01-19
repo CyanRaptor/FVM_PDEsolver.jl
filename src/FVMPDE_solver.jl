@@ -5,7 +5,7 @@ function FVMPDESolve(prob::FVMPDEProblem;kwargs...)
         scheme = kwargs[:scheme]
         kwargs = Dict([p for p in pairs(kwargs) if p[1] != :scheme])
     else
-        scheme = UpWind_F
+        scheme = uw1
     end
 
     if haskey(kwargs,:showstep)
