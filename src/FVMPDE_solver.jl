@@ -65,7 +65,8 @@ function FVMPDE_∂u∂t(prob::FVMPDEProblem,u,t,scheme,dt_show)
 end
 
 function FVMPDE_∂F∂x(scheme,func_F,u,grid::FVMPDEGrid,_dim,t,p,jac)
-    Uₓᴸ, Uₓᴿ = scheme(u,grid,_dim)
+    Uₓᴸ, Uₓᴿ = GeneralFluxLimiter(scheme,u,grid,_dim)
+
 
     ∂f∂x = zeros(size(u))
 
