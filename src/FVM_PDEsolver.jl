@@ -15,6 +15,6 @@ export uw1,uw2,uw3,uw4,scd,fr,kn,sb,mm,mu,ha,va1,va2,vl,op,hc,hq,cm,mc,sm,um
 
 
 include("FVMPDE_solver.jl")
-export FVMPDESolve
+export solve
 
 end # module

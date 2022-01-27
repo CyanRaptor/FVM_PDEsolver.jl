@@ -1,5 +1,5 @@
 
-function FVMPDESolve(prob::FVMPDEProblem;kwargs...)
+function solve(prob::FVMPDEProblem;kwargs...)
     prob.t = 0
     if haskey(kwargs,:scheme)
         scheme = kwargs[:scheme]
@@ -80,9 +80,9 @@ end
 
 function LRJacobian(func_F,u,t,p,jac)
     if jac
-        A = func_F(u)
-    else
         A = ForwardDiff.jacobian(func_F, u)
+    else
+        A = func_F(u)
     end
 
     if size(A,1) == 1

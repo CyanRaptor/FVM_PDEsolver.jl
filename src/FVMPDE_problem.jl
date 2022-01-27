@@ -50,7 +50,7 @@ mutable struct FVMPDEProblem
             jac = kwargs[:jacobian]
             kwargs = Dict([p for p in pairs(kwargs) if p[1] != :jacobian])
         else
-            jac = false
+            jac = true
         end
         zeroFunc(U) = zeros(size(U))
         F = kwargs[:F]
@@ -87,7 +87,7 @@ mutable struct FVMPDEProblem
         else
             S = zeroFunc
         end
-        if !jac
+        if jac
             @assert size(F(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
             @assert size(G(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
             @assert size(H(U0[grid.indices[1],:])) == size(U0[grid.indices[1],:])
